@@ -56,15 +56,24 @@ graph1_tab = html.Div([
     html.Label(["Select variable for the X axis:",
             dcc.Dropdown('dd-x',
                 options= opt_var,
-                value= [variables[0]],
+                value= variables[0],
                 multi= False
             )
         ]),
     html.Label(["Select variable for the Y axis:",
             dcc.Dropdown('dd-y',
                 options= opt_var,
-                value= [variables[0]],
+                value= variables[1],
                 multi= False
+            )
+        ]),
+    html.Label(['Color by sex or species',
+        dcc.RadioItems(id='color',
+            options=[
+                {'label': 'Sex', 'value': 'sex'},
+                {'label': 'Species', 'value': 'sp'}
+                ],
+            value='sex'
             )
         ]),
     dcc.Graph(id="sca_crabs",
@@ -134,11 +143,12 @@ def update_table_tab(data, tab):
      Output('sca_crabs', 'figure'),
      Input('dd-x', 'value'),
      Input('dd-y','value'),
+     Input('color','value'),
      State('tabs','value'))
-def update_figure(varx, vary,tab):
+def update_figure(varx, vary, color, tab):
     if tab != 'tab-g':
         return None    
-    return px.scatter(crabs, x=varx, y=vary ,color='sex')
+    return px.scatter(crabs, x=varx, y=vary ,color=color)
 
 
 if __name__ == '__main__':
