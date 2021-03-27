@@ -7,9 +7,18 @@ import pandas as pd
 import plotly.express as px
 import json
 
+crabs_url = 'https://raw.githubusercontent.com/pablo-qui/final_project/master/crabs.csv'
+crabs = pd.read_csv(crabs_url)
+crabs.drop('index', inplace=True, axis=1)
 
 
-app = dash.Dash(__name__, title="Dash App")
+crabs_cols = [{"name": i, "id": i} for i in crabs.columns]
+crabs_sex = crabs['sex'].sort_values().unique()
+opt_sex = [{'label': x, 'value': x} for x in crabs_sex]
+#col_vore = {x:px.colors.qualitative.Pastel[i] for i, x in enumerate(df_vore)}
+
+
+app = dash.Dash(__name__, title="Final Project Dash App")
 
 markdown_text = '''
 ## Some references
@@ -19,7 +28,10 @@ markdown_text = '''
 '''
 
 table1_tab = html.Div([
-    dcc.Markdown('table 1')
+    dt.DataTable(id="my-table",
+                columns = crabs_cols,
+                data= crabs.to_dict("records")
+            )
 ])
 graph1_tab = html.Div([
     dcc.Markdown('graph 1')
@@ -35,6 +47,14 @@ graph2_tab = html.Div([
 
 app.layout = html.Div([
      dcc.Markdown(markdown_text),
+     html.Label(["Select sex of the crab:",
+            dcc.Dropdown('my-dropdown',
+                options= opt_sex,
+                value= [crabs_sex[0]],
+                multi= True
+            )
+        ]),
+     html.Div(id="data",style={'display':'none'}),
      dcc.Tabs(id="tabs", value='tab-t', children=[
             dcc.Tab(label='Table 1', value='tab-t'),
             dcc.Tab(label='Graph 1', value='tab-g'),
@@ -58,6 +78,24 @@ def update_tabs(v):
         return graph2_tab
     return table1_tab
 
+# filtering the data
+@app.callback(
+    Output('data', 'children'),
+    Input('my-dropdown','value'))
+def update_crabs(select):
+    filter = crabs['sex'].isin(select)
+    return crabs[filter].to_json()
+
+# updating the table
+@app.callback(
+     Output('my-table', 'data'),
+     Input('data', 'children'),
+     State('tabs','value'))
+def update_table_tab(data, tab):
+    if tab != 'tab-t':
+        return None
+    crabs = pd.read_json(data)
+    return crabs.to_dict("records")
 
 
 if __name__ == '__main__':
