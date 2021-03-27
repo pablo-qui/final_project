@@ -15,6 +15,8 @@ crabs.drop('index', inplace=True, axis=1)
 crabs_cols = [{"name": i, "id": i} for i in crabs.columns]
 crabs_sex = crabs['sex'].sort_values().unique()
 opt_sex = [{'label': x, 'value': x} for x in crabs_sex]
+crabs_sp = crabs['sp'].sort_values().unique()
+opt_sp = [{'label': x , 'value': x} for x in crabs_sp]
 #col_vore = {x:px.colors.qualitative.Pastel[i] for i, x in enumerate(df_vore)}
 
 
@@ -48,9 +50,16 @@ graph2_tab = html.Div([
 app.layout = html.Div([
      dcc.Markdown(markdown_text),
      html.Label(["Select sex of the crab:",
-            dcc.Dropdown('my-dropdown',
+            dcc.Dropdown('dd-sex',
                 options= opt_sex,
                 value= [crabs_sex[0]],
+                multi= True
+            )
+        ]),
+        html.Label(["Select species of the crab:",
+            dcc.Dropdown('dd-sp',
+                options= opt_sp,
+                value= [crabs_sp[0]],
                 multi= True
             )
         ]),
@@ -81,9 +90,10 @@ def update_tabs(v):
 # filtering the data
 @app.callback(
     Output('data', 'children'),
-    Input('my-dropdown','value'))
-def update_crabs(select):
-    filter = crabs['sex'].isin(select)
+    Input('dd-sex','value'),
+    Input('dd-sp','value'))
+def update_crabs(sex,species):
+    filter = crabs['sex'].isin(sex) & crabs['sp'].isin(species)
     return crabs[filter].to_json()
 
 # updating the table
