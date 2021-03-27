@@ -81,11 +81,14 @@ graph1_tab = html.Div([
             x="FL",
             y="RW",
             color="sex")            
+    ),
+    dt.DataTable(id="selected_crabs",
+        columns = crabs_cols
     )
 ])
 
 table2_tab = html.Div([
-    dcc.Markdown(variables)
+    dcc.Markdown('table 2')
 ])
 
 graph2_tab = html.Div([
@@ -148,7 +151,20 @@ def update_table_tab(data, tab):
 def update_figure(varx, vary, color, tab):
     if tab != 'tab-g':
         return None    
-    return px.scatter(crabs, x=varx, y=vary ,color=color)
+    return px.scatter(crabs, x=varx, y=vary , custom_data=['BD'], color=color)
+
+
+#updating the table below the graph with the selected points
+@app.callback(
+    Output('selected_crabs', 'data'),
+    Input('sca_crabs', 'selectedData'))
+def display_selected_data(selectedData):
+    if selectedData is None:
+        return None
+    names = [o['customdata'][0] for o in selectedData['points']]
+    filter = crabs['BD'].isin(names)
+    return crabs[filter].to_dict('records')
+
 
 
 if __name__ == '__main__':
