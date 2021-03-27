@@ -31,6 +31,11 @@ markdown_text = '''
 - [Dash Core Components](dash.plotly.com/dash-core-components)  
 - [Dash Bootstrap Components](dash-bootstrap-components.opensource.faculty.ai/docs/components)  
 '''
+colors = {
+    'background': '#111111',
+    'text': '#7FDBFF'
+}
+
 
 table1_tab = html.Div([
        html.Label(["Select sex of the crab:",
@@ -86,6 +91,8 @@ graph1_tab = html.Div([
         columns = crabs_cols
     )
 ])
+
+
 
 table2_tab = html.Div([
     dcc.Markdown('table 2')
@@ -168,7 +175,6 @@ def display_selected_data(selectedData):
     names = [o['customdata'][0] for o in selectedData['points']]
     filter = crabs['BD'].isin(names)
     return crabs[filter].to_dict('records')
-
 
 
 if __name__ == '__main__':
