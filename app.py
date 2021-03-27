@@ -96,6 +96,10 @@ graph2_tab = html.Div([
 ])
 
 app.layout = html.Div([
+    html.Div([
+        html.H1(app.title, className= "app-header--title")
+    ], className= "app-header"),
+
      dcc.Markdown(markdown_text),
      html.Div(id="data_crabs",style={'display':'none'}),
      dcc.Tabs(id="tabs", value='tab-t', children=[
@@ -151,7 +155,7 @@ def update_table_tab(data, tab):
 def update_figure(varx, vary, color, tab):
     if tab != 'tab-g':
         return None    
-    return px.scatter(crabs, x=varx, y=vary , custom_data=['BD'], color=color)
+    return px.scatter(crabs, x=varx, y=vary, custom_data=['BD'], color=color)
 
 
 #updating the table below the graph with the selected points
