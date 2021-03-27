@@ -17,6 +17,9 @@ crabs_sex = crabs['sex'].sort_values().unique()
 opt_sex = [{'label': x, 'value': x} for x in crabs_sex]
 crabs_sp = crabs['sp'].sort_values().unique()
 opt_sp = [{'label': x , 'value': x} for x in crabs_sp]
+variables = crabs.columns[2:7]
+opt_var = [{'label': x , 'value': x} for x in variables]
+
 #col_vore = {x:px.colors.qualitative.Pastel[i] for i, x in enumerate(df_vore)}
 
 
@@ -30,26 +33,7 @@ markdown_text = '''
 '''
 
 table1_tab = html.Div([
-    dt.DataTable(id="my-table",
-                columns = crabs_cols,
-                data= crabs.to_dict("records")
-            )
-])
-graph1_tab = html.Div([
-    dcc.Markdown('graph 1')
-])
-
-table2_tab = html.Div([
-    dcc.Markdown('table 2')
-])
-
-graph2_tab = html.Div([
-    dcc.Markdown('graph 2')
-])
-
-app.layout = html.Div([
-     dcc.Markdown(markdown_text),
-     html.Label(["Select sex of the crab:",
+       html.Label(["Select sex of the crab:",
             dcc.Dropdown('dd-sex',
                 options= opt_sex,
                 value= [crabs_sex[0]],
@@ -63,7 +47,45 @@ app.layout = html.Div([
                 multi= True
             )
         ]),
-     html.Div(id="data",style={'display':'none'}),
+    dt.DataTable(id="my-table",
+                columns = crabs_cols,
+                data = crabs.to_dict("records")
+            )
+])
+graph1_tab = html.Div([
+    html.Label(["Select variable for the X axis:",
+            dcc.Dropdown('dd-x',
+                options= opt_var,
+                value= [variables[0]],
+                multi= False
+            )
+        ]),
+    html.Label(["Select variable for the Y axis:",
+            dcc.Dropdown('dd-y',
+                options= opt_var,
+                value= [variables[0]],
+                multi= False
+            )
+        ]),
+    dcc.Graph(id="sca_crabs",
+        figure= px.scatter(crabs,
+            x="FL",
+            y="RW",
+            color="sex")            
+    )
+])
+
+table2_tab = html.Div([
+    dcc.Markdown(variables)
+])
+
+graph2_tab = html.Div([
+    dcc.Markdown('graph 2')
+])
+
+app.layout = html.Div([
+     dcc.Markdown(markdown_text),
+     html.Div(id="data_crabs",style={'display':'none'}),
      dcc.Tabs(id="tabs", value='tab-t', children=[
             dcc.Tab(label='Table 1', value='tab-t'),
             dcc.Tab(label='Graph 1', value='tab-g'),
@@ -89,7 +111,7 @@ def update_tabs(v):
 
 # filtering the data
 @app.callback(
-    Output('data', 'children'),
+    Output('data_crabs', 'children'),
     Input('dd-sex','value'),
     Input('dd-sp','value'))
 def update_crabs(sex,species):
@@ -99,13 +121,24 @@ def update_crabs(sex,species):
 # updating the table
 @app.callback(
      Output('my-table', 'data'),
-     Input('data', 'children'),
+     Input('data_crabs', 'children'),
      State('tabs','value'))
 def update_table_tab(data, tab):
     if tab != 'tab-t':
         return None
     crabs = pd.read_json(data)
     return crabs.to_dict("records")
+
+#updating the graph
+@app.callback(
+     Output('sca_crabs', 'figure'),
+     Input('dd-x', 'value'),
+     Input('dd-y','value'),
+     State('tabs','value'))
+def update_figure(varx, vary,tab):
+    if tab != 'tab-g':
+        return None    
+    return px.scatter(crabs, x=varx, y=vary ,color='sex')
 
 
 if __name__ == '__main__':
