@@ -11,6 +11,7 @@ import json
 crabs_url = 'https://raw.githubusercontent.com/pablo-qui/final_project/master/crabs.csv'
 crabs = pd.read_csv(crabs_url)
 crabs.drop('index', inplace=True, axis=1)
+navalue=crabs.isnull().any().sum()
 
 
 crabs_cols = [{"name": i, "id": i} for i in crabs.columns]
@@ -58,10 +59,10 @@ table1_tab = html.Div([
     dt.DataTable(id="my-table",
                 columns = crabs_cols,
                 data = crabs.to_dict("records"),
-                style_header={
-        'backgroundColor': 'rgb(230, 230, 230)',
-        'fontWeight': 'bold'
-    }
+                style_as_list_view=True,
+                style_cell={'padding': '5px'},
+                style_data={ 'border': '1px solid blue' },
+    style_header={ 'border': '1px solid pink' },     
             )
 ])
 graph1_tab = html.Div([
@@ -96,6 +97,9 @@ graph1_tab = html.Div([
     ),
     dt.DataTable(id="selected_crabs",
         columns = crabs_cols,
+        style_cell={
+        'backgroundColor': 'rgb(50, 50, 50)',
+        'color': 'white' },
         style_header={
         'backgroundColor': 'rgb(230, 230, 230)',
         'fontWeight': 'bold'
