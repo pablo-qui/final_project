@@ -12,6 +12,7 @@ import calendar
 crabs_url = 'https://raw.githubusercontent.com/pablo-qui/final_project/master/crabs.csv'
 air_url='https://raw.githubusercontent.com/pablo-qui/final_project/master/airdata.csv'
 air=pd.read_csv(air_url).dropna()
+
 crabs = pd.read_csv(crabs_url).dropna()
 crabs.drop('index', inplace=True, axis=1)
 navalue1=crabs.isnull().any().sum()
@@ -27,13 +28,12 @@ opt_var = [{'label': x , 'value': x} for x in variables]
 
 
 air_cols = [{"name": i, "id": i} for i in air.columns]
-air_Momth = air['Month'].sort_values().unique()
-opt_Month = [{'label': x, 'value': x} for x in air_Momth]
+air_Month =air['Month'].sort_values().unique()
+opt_Month = [{'label': x, 'value': x} for x in air_Month]
 variable_air = air.columns[0:4]
 opt_var_air = [{'label': x , 'value': x} for x in variable_air]
-
-
-
+air_Day = air['Day'].sort_values().unique()
+opt_Dayay=[{'label': x, 'value': x} for x in air_Day]
 
 
 #col_vore = {x:px.colors.qualitative.Pastel[i] for i, x in enumerate(df_vore)}
@@ -124,31 +124,48 @@ graph1_tab = html.Div([
 
 
 table2_tab = html.Div([
-    dcc.Markdown('table 2')
+      html.Label(["Select the month of air :",
+            dcc.Dropdown('dd-month',
+                options= opt_Month,
+                value= [air_Momth[0]],
+                multi= True
+            )
+        ]),
+        html.Label(["input the day of the this month:",
+            dcc.input(id='day'
+            )
+        ]),
+    dt.DataTable(id="my-table_air",
+                columns = air_cols,
+                data = air.to_dict("records"),
+                style_as_list_view=True,
+                style_cell={'padding': '5px'},
+                style_data={ 'border': '1px solid blue' },
+    style_header={ 'border': '1px solid pink' },     
+            )
 ])
 
 graph2_tab = html.Div([
     html.Label(["Select variable for the X axis:",
-            dcc.Dropdown('dd-x',
+            dcc.Dropdown('dd-x_air',
                 options= opt_var_air,
                 value= variable_air[0],
                 multi= False
             )
         ]),
     html.Label(["Select variable for the Y axis:",
-            dcc.Dropdown('dd-y',
+            dcc.Dropdown('dd-y_air',
                 options= opt_var_air,
                 value= variable_air[1],
                 multi= False
             )
         ]),
     html.Label(['Color by Month',
-        dcc.RadioItems(id='color',
-            options=[
-                {'label': 'Month', 'value': 'Month'}
-                ],
-            value='Month'
-            )
+        dcc.Dropdown('color_air',
+                     options=opt_Month,
+                     value=air_Month[0],
+                multi= False
+                )
         ]),
     dcc.Graph(id="sca_air",
         figure= px.scatter(air,
@@ -199,7 +216,9 @@ def update_tabs(v):
         return graph2_tab
     return table1_tab
 
-# filtering the data
+
+
+# filtering the data carbs
 @app.callback(
     Output('data_crabs', 'children'),
     Input('dd-sex','value'),
@@ -208,7 +227,18 @@ def update_crabs(sex,species):
     filter = crabs['sex'].isin(sex) & crabs['sp'].isin(species)
     return crabs[filter].to_json()
 
-# updating the table
+
+# filtering the data air
+@app.callback(
+    Output('data_air', 'children'),
+    Input('dd-month','value'),
+    Input('day','value'))
+def update_air(month,day):
+    filter = air['Month'].isin(month) & air['Day'].isin(day)
+    return air[filter].to_json()
+
+
+# updating the table 1
 @app.callback(
      Output('my-table', 'data'),
      Input('data_crabs', 'children'),
@@ -219,7 +249,19 @@ def update_table_tab(data, tab):
     crabs = pd.read_json(data)
     return crabs.to_dict("records")
 
-#updating the graph
+
+# updating the table 2
+@app.callback(
+     Output('my-table_air', 'data'),
+     Input('data_air', 'children'),
+     State('tabs','value'))
+def update_table_tab_air(data, tab):
+    if tab != 'tab-t':
+        return None
+    crabs = pd.read_json(data)
+    return crabs.to_dict("records")
+
+#updating the graph 1
 @app.callback(
      Output('sca_crabs', 'figure'),
      Input('dd-x', 'value'),
@@ -231,10 +273,11 @@ def update_figure(varx, vary, color, tab):
         return None    
     return px.scatter(crabs, x=varx, y=vary, custom_data=['BD'], color=color)
 
+#updating the graph 2
 @app.callback(
      Output('sca_air', 'figure'),
-     Input('dd-x', 'value'),
-     Input('dd-y','value'),
+     Input('dd-x_air', 'value'),
+     Input('dd-y_air','value'),
      Input('color','value'),
      State('tabs','value'))
 def update_figure_air(varx, vary, color, tab):
