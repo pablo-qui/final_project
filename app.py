@@ -77,6 +77,7 @@ table1_tab = html.Div([
     style_header={ 'border': '1px solid pink' },     
             )
 ])
+
 graph1_tab = html.Div([
     html.Label(["Select variable for the X axis:",
             dcc.Dropdown('dd-x',
@@ -230,6 +231,17 @@ def update_figure(varx, vary, color, tab):
         return None    
     return px.scatter(crabs, x=varx, y=vary, custom_data=['BD'], color=color)
 
+@app.callback(
+     Output('sca_air', 'figure'),
+     Input('dd-x', 'value'),
+     Input('dd-y','value'),
+     Input('color','value'),
+     State('tabs','value'))
+def update_figure_air(varx, vary, color, tab):
+    if tab != 'tab-g':
+        return None    
+    return px.scatter(air, x=varx, y=vary, custom_data=['Ozone'], color=color)
+
 
 #updating the table below the graph with the selected points
 @app.callback(
@@ -241,6 +253,16 @@ def display_selected_data(selectedData):
     names = [o['customdata'][0] for o in selectedData['points']]
     filter = crabs['BD'].isin(names)
     return crabs[filter].to_dict('records')
+
+@app.callback(
+    Output('selected_air', 'data'),
+    Input('sca_air', 'selectedData'))
+def display_selected_data_air(selectedData):
+    if selectedData is None:
+        return None
+    names = [o['customdata'][0] for o in selectedData['points']]
+    filter = crabs['Ozone'].isin(names)
+    return air[filter].to_dict('records')
 
 
 if __name__ == '__main__':
