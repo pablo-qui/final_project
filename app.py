@@ -11,7 +11,7 @@ import json
 crabs_url = 'https://raw.githubusercontent.com/pablo-qui/final_project/master/crabs.csv'
 crabs = pd.read_csv(crabs_url).dropna()
 crabs.drop('index', inplace=True, axis=1)
-navalue=crabs.isnull().any().sum()
+
 
 
 crabs_cols = [{"name": i, "id": i} for i in crabs.columns]
@@ -192,5 +192,5 @@ def display_selected_data(selectedData):
 
 
 if __name__ == '__main__':
-    app.server.run(threaded=False)
+    app.server.run(debug=True)
     
