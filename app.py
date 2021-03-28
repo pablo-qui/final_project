@@ -57,7 +57,11 @@ table1_tab = html.Div([
         ]),
     dt.DataTable(id="my-table",
                 columns = crabs_cols,
-                data = crabs.to_dict("records")
+                data = crabs.to_dict("records"),
+                style_header={
+        'backgroundColor': 'rgb(230, 230, 230)',
+        'fontWeight': 'bold'
+    }
             )
 ])
 graph1_tab = html.Div([
@@ -91,7 +95,11 @@ graph1_tab = html.Div([
             color="sex")            
     ),
     dt.DataTable(id="selected_crabs",
-        columns = crabs_cols
+        columns = crabs_cols,
+        style_header={
+        'backgroundColor': 'rgb(230, 230, 230)',
+        'fontWeight': 'bold'
+    }
     )
 ])
 
