@@ -7,12 +7,11 @@ import dash_table as dt
 import pandas as pd
 import plotly.express as px
 import json
-import calendar
+
 
 crabs_url = 'https://raw.githubusercontent.com/pablo-qui/final_project/master/crabs.csv'
 air_url='https://raw.githubusercontent.com/pablo-qui/final_project/master/airdata.csv'
 air=pd.read_csv(air_url).dropna()
-
 crabs = pd.read_csv(crabs_url).dropna()
 crabs.drop('index', inplace=True, axis=1)
 navalue1=crabs.isnull().any().sum()
@@ -127,7 +126,7 @@ table2_tab = html.Div([
       html.Label(["Select the month of air :",
             dcc.Dropdown('dd-month',
                 options= opt_Month,
-                value= [air_Momth[0]],
+                value= [air_Month[0]],
                 multi= True
             )
         ]),
