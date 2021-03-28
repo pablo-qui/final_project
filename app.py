@@ -11,6 +11,7 @@ import json
 crabs_url = 'https://raw.githubusercontent.com/pablo-qui/final_project/master/crabs.csv'
 crabs = pd.read_csv(crabs_url).dropna()
 crabs.drop('index', inplace=True, axis=1)
+navalue=crabs.isnull().any().sum()
 
 
 crabs_cols = [{"name": i, "id": i} for i in crabs.columns]
@@ -31,8 +32,9 @@ markdown_text = '''
 - [Dash HTML Components](dash.plotly.com/dash-html-components)
 - [Dash Core Components](dash.plotly.com/dash-core-components)  
 - [Dash Bootstrap Components](dash-bootstrap-components.opensource.faculty.ai/docs/components) 
-- [Dash DataTable](https://dash.plotly.com/datatable)   
+- [Dash DataTable](https://dash.plotly.com/datatable)  
 '''
+
 colors = {
     'background': '#111111',
     'text': '#7FDBFF'
@@ -104,6 +106,8 @@ graph1_tab = html.Div([
     )
 ])
 
+
+
 table2_tab = html.Div([
     dcc.Markdown('table 2')
 ])
@@ -120,10 +124,10 @@ app.layout = html.Div([
      dcc.Markdown(markdown_text),
      html.Div(id="data_crabs",style={'display':'none'}),
      dcc.Tabs(id="tabs", value='tab-t', children=[
-            dcc.Tab(label='Table 1', value='tab-t'),
-            dcc.Tab(label='Graph 1', value='tab-g'),
-            dcc.Tab(label='Table 2', value='tab-t2'),
-            dcc.Tab(label='Graph 2', value='tab-g2')
+            dcc.Tab(label='Table 1', value='tab-t',style={"width":"100%","text-align":"center","padding-top":"5%"}),
+            dcc.Tab(label='Graph 1', value='tab-g',style={"width":"100%","text-align":"center","padding-top":"5%"}),
+            dcc.Tab(label='Table 2', value='tab-t2',style={"width":"100%","text-align":"center","padding-top":"5%"}),
+            dcc.Tab(label='Graph 2', value='tab-g2',style={"width":"100%","text-align":"center","padding-top":"5%"})
         ]),
         html.Div(id="tabs-content")
         
@@ -187,7 +191,6 @@ def display_selected_data(selectedData):
     return crabs[filter].to_dict('records')
 
 
-
 if __name__ == '__main__':
-    app.server.run(debug=True)
+    app.server.run(threaded=False)
     
