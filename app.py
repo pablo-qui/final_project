@@ -2,6 +2,7 @@ import dash
 from dash.dependencies import Input, Output, State
 import dash_html_components as html
 import dash_core_components as dcc
+import dash_bootstrap_components as dbc
 import dash_table as dt
 import pandas as pd
 import plotly.express as px
@@ -23,14 +24,16 @@ opt_var = [{'label': x , 'value': x} for x in variables]
 #col_vore = {x:px.colors.qualitative.Pastel[i] for i, x in enumerate(df_vore)}
 
 
-app = dash.Dash(__name__, title="Final Project Dash App")
+app = dash.Dash(__name__, title="Final Project Dash App",external_stylesheets=[dbc.themes.BOOTSTRAP])
 
 markdown_text = '''
 ## Some references
 - [Dash HTML Components](dash.plotly.com/dash-html-components)
 - [Dash Core Components](dash.plotly.com/dash-core-components)  
-- [Dash Bootstrap Components](dash-bootstrap-components.opensource.faculty.ai/docs/components)  
+- [Dash Bootstrap Components](dash-bootstrap-components.opensource.faculty.ai/docs/components) 
+- [Dash DataTable](https://dash.plotly.com/datatable)  
 '''
+
 colors = {
     'background': '#111111',
     'text': '#7FDBFF'
@@ -110,10 +113,10 @@ app.layout = html.Div([
      dcc.Markdown(markdown_text),
      html.Div(id="data_crabs",style={'display':'none'}),
      dcc.Tabs(id="tabs", value='tab-t', children=[
-            dcc.Tab(label='Table 1', value='tab-t'),
-            dcc.Tab(label='Graph 1', value='tab-g'),
-            dcc.Tab(label='Table 2', value='tab-t2'),
-            dcc.Tab(label='Graph 2', value='tab-g2')
+            dcc.Tab(label='Table 1', value='tab-t',style={"width":"100%","text-align":"center","padding-top":"5%"}),
+            dcc.Tab(label='Graph 1', value='tab-g',style={"width":"100%","text-align":"center","padding-top":"5%"}),
+            dcc.Tab(label='Table 2', value='tab-t2',style={"width":"100%","text-align":"center","padding-top":"5%"}),
+            dcc.Tab(label='Graph 2', value='tab-g2',style={"width":"100%","text-align":"center","padding-top":"5%"})
         ]),
         html.Div(id="tabs-content")
         
@@ -178,5 +181,5 @@ def display_selected_data(selectedData):
 
 
 if __name__ == '__main__':
-    app.server.run(debug=True)
+    app.server.run(threaded=False)
     

@@ -1,0 +1,26 @@
+introduction :
+
+This app is use to analysis the crab data.
+
+This data frame contains the following columns:
+
+"sp", which means species--"B" or "O" for blue or orange.
+
+"sex", as it says, the gender
+
+"FL",which means frontal lobe size (mm)
+
+"RW",which means rear width (mm)
+
+"CL",which means carapace length (mm)
+
+"CW",which means carapace width (mm)
+
+"BD",which means body depth (mm)
+
+In this app, you can easily see the table made by sex and species of crabs.
+
+further more, you can observe the information and distribution of the data accurately and clearly with interactive plots.
+
+
+
