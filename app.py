@@ -2,13 +2,14 @@ import dash
 from dash.dependencies import Input, Output, State
 import dash_html_components as html
 import dash_core_components as dcc
+import dash_bootstrap_components as dbc
 import dash_table as dt
 import pandas as pd
 import plotly.express as px
 import json
 
 crabs_url = 'https://raw.githubusercontent.com/pablo-qui/final_project/master/crabs.csv'
-crabs = pd.read_csv(crabs_url)
+crabs = pd.read_csv(crabs_url).dropna()
 crabs.drop('index', inplace=True, axis=1)
 
 
@@ -29,9 +30,13 @@ markdown_text = '''
 ## Some references
 - [Dash HTML Components](dash.plotly.com/dash-html-components)
 - [Dash Core Components](dash.plotly.com/dash-core-components)  
-- [Dash Bootstrap Components](dash-bootstrap-components.opensource.faculty.ai/docs/components)  
+- [Dash Bootstrap Components](dash-bootstrap-components.opensource.faculty.ai/docs/components) 
+- [Dash DataTable](https://dash.plotly.com/datatable)   
 '''
-
+colors = {
+    'background': '#111111',
+    'text': '#7FDBFF'
+}
 table1_tab = html.Div([
        html.Label(["Select sex of the crab:",
             dcc.Dropdown('dd-sex',
@@ -49,7 +54,11 @@ table1_tab = html.Div([
         ]),
     dt.DataTable(id="my-table",
                 columns = crabs_cols,
-                data = crabs.to_dict("records")
+                data = crabs.to_dict("records"),
+                style_as_list_view=True,
+                style_cell={'padding': '5px'},
+                style_data={ 'border': '1px solid blue' },
+    style_header={ 'border': '1px solid pink' },     
             )
 ])
 graph1_tab = html.Div([
@@ -83,7 +92,15 @@ graph1_tab = html.Div([
             color="sex")            
     ),
     dt.DataTable(id="selected_crabs",
-        columns = crabs_cols
+        columns = crabs_cols,
+        style_cell={
+        'backgroundColor': 'rgb(50, 50, 50)',
+        'color': 'white' },
+        style_header={
+        'backgroundColor': 'rgb(230, 230, 230)',
+        'fontWeight': 'bold',
+        'color': 'rgb(50, 50, 50)'
+    }
     )
 ])
 
