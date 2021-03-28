@@ -43,6 +43,7 @@ markdown_text = '''
 - [Dash Core Components](dash.plotly.com/dash-core-components)  
 - [Dash Bootstrap Components](dash-bootstrap-components.opensource.faculty.ai/docs/components) 
 - [Dash DataTable](https://dash.plotly.com/datatable)  
+-[Introduction](https://raw.githubusercontent.com/pablo-qui/final_project/master/introduction.txt)
 '''
 
 colors = {
