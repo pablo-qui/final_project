@@ -7,12 +7,20 @@ import dash_table as dt
 import pandas as pd
 import plotly.express as px
 import json
+import calendar
 
 crabs_url = 'https://raw.githubusercontent.com/pablo-qui/final_project/master/crabs.csv'
+air_url='https://raw.githubusercontent.com/pablo-qui/final_project/master/airdata.csv'
+air=pd.read_csv(air_url).dropna()
 crabs = pd.read_csv(crabs_url).dropna()
 crabs.drop('index', inplace=True, axis=1)
+<<<<<<< HEAD
 
 
+=======
+navalue1=crabs.isnull().any().sum()
+navalue2=air.isnull().any().sum()
+>>>>>>> d31533c9bb9e18ffeaa21cab70ecb2ee94518ff7
 
 crabs_cols = [{"name": i, "id": i} for i in crabs.columns]
 crabs_sex = crabs['sex'].sort_values().unique()
@@ -21,6 +29,17 @@ crabs_sp = crabs['sp'].sort_values().unique()
 opt_sp = [{'label': x , 'value': x} for x in crabs_sp]
 variables = crabs.columns[2:7]
 opt_var = [{'label': x , 'value': x} for x in variables]
+
+
+air_cols = [{"name": i, "id": i} for i in air.columns]
+air_Momth = air['Month'].sort_values().unique()
+opt_Month = [{'label': x, 'value': x} for x in air_Momth]
+variable_air = air.columns[0:4]
+opt_var_air = [{'label': x , 'value': x} for x in variable_air]
+
+
+
+
 
 #col_vore = {x:px.colors.qualitative.Pastel[i] for i, x in enumerate(df_vore)}
 
@@ -63,6 +82,7 @@ table1_tab = html.Div([
     style_header={ 'border': '1px solid pink' },     
             )
 ])
+
 graph1_tab = html.Div([
     html.Label(["Select variable for the X axis:",
             dcc.Dropdown('dd-x',
@@ -113,7 +133,45 @@ table2_tab = html.Div([
 ])
 
 graph2_tab = html.Div([
-    dcc.Markdown('graph 2')
+    html.Label(["Select variable for the X axis:",
+            dcc.Dropdown('dd-x',
+                options= opt_var_air,
+                value= variable_air[0],
+                multi= False
+            )
+        ]),
+    html.Label(["Select variable for the Y axis:",
+            dcc.Dropdown('dd-y',
+                options= opt_var_air,
+                value= variable_air[1],
+                multi= False
+            )
+        ]),
+    html.Label(['Color by Month',
+        dcc.RadioItems(id='color',
+            options=[
+                {'label': 'Month', 'value': 'Month'}
+                ],
+            value='Month'
+            )
+        ]),
+    dcc.Graph(id="sca_air",
+        figure= px.scatter(air,
+            x="Ozone",
+            y="Wind",
+            color="Month")            
+    ),
+    dt.DataTable(id="selected_air",
+        columns = air_cols,
+        style_cell={
+        'backgroundColor': 'rgb(50, 50, 50)',
+        'color': 'white' },
+        style_header={
+        'backgroundColor': 'rgb(230, 230, 230)',
+        'fontWeight': 'bold',
+        'color': 'rgb(50, 50, 50)'
+    }
+    )
 ])
 
 app.layout = html.Div([
@@ -178,6 +236,17 @@ def update_figure(varx, vary, color, tab):
         return None    
     return px.scatter(crabs, x=varx, y=vary, custom_data=['BD'], color=color)
 
+@app.callback(
+     Output('sca_air', 'figure'),
+     Input('dd-x', 'value'),
+     Input('dd-y','value'),
+     Input('color','value'),
+     State('tabs','value'))
+def update_figure_air(varx, vary, color, tab):
+    if tab != 'tab-g':
+        return None    
+    return px.scatter(air, x=varx, y=vary, custom_data=['Ozone'], color=color)
+
 
 #updating the table below the graph with the selected points
 @app.callback(
@@ -189,6 +258,16 @@ def display_selected_data(selectedData):
     names = [o['customdata'][0] for o in selectedData['points']]
     filter = crabs['BD'].isin(names)
     return crabs[filter].to_dict('records')
+
+@app.callback(
+    Output('selected_air', 'data'),
+    Input('sca_air', 'selectedData'))
+def display_selected_data_air(selectedData):
+    if selectedData is None:
+        return None
+    names = [o['customdata'][0] for o in selectedData['points']]
+    filter = crabs['Ozone'].isin(names)
+    return air[filter].to_dict('records')
 
 
 if __name__ == '__main__':
